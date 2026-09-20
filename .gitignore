@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv*/
+.pytest_cache/
+.ruff_cache/
+runs/
+models/
+delete_me/
+data/events.csv
+data/crop_check_*.jpg
