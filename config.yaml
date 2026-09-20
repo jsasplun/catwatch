@@ -1,0 +1,66 @@
+# The order of `classes` defines which number the model outputs for each
+# class. Never reorder after training. Add new classes only at the end, then
+# retrain. If you have no "both cats" images yet, remove both_cats until you
+# have roughly 30 or more; training refuses to start with an empty class.
+classes:
+  - empty
+  - black_patch_cat
+  - orange_patch_cat
+  - both_cats
+
+# Friendly names for printed output and the event log. Put Orion and Momo
+# in whichever slot matches their coats.
+display_names:
+  empty: "Empty"
+  black_patch_cat: "Cat with black patches"
+  orange_patch_cat: "Cat with orange patches"
+  both_cats: "Both cats"
+
+# Keys for the labeling tool. "unusable" is not a class: images marked with it
+# are recorded (so you never see them again) but left out of training.
+label_keys:
+  "0": empty
+  "1": black_patch_cat
+  "2": orange_patch_cat
+  "3": both_cats
+  "x": unusable
+
+camera:
+  source: picamera2        # or 0 for a USB webcam, or a path to a video file
+  width: 1280
+  height: 960
+  lens_position: null      # e.g. 2.0 for a bowl 0.5 m away (autofocus cameras)
+
+# Region the model looks at, in pixels of the full frame. null = whole frame.
+# Set it with `python -m catwatch.check_crop` BEFORE you start labeling.
+bowl_crop: null
+# bowl_crop: {x: 240, y: 80, width: 800, height: 800}
+
+capture:
+  min_seconds_between_motion_saves: 2
+  periodic_save_every_seconds: 600
+  motion_min_changed_fraction: 0.02
+
+paths:
+  raw_dir: data/raw
+  labels_file: data/labels.csv
+  events_file: data/events.csv
+  runs_dir: runs
+  models_dir: models
+
+training:
+  seed: 0
+  image_size: 224
+  epochs: 15
+  batch_size: 32
+  learning_rate: 0.0003
+  num_workers: 4
+  split_fractions: {train: 0.7, val: 0.15, test: 0.15}
+
+monitor:
+  model_dir: models/CHANGE_ME
+  background_label: empty
+  predictions_per_second: 2
+  smoothing_window: 5        # odd number, so the majority vote can't tie
+  min_confidence: 0.6
+  min_event_seconds: 3
