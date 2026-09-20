@@ -1,0 +1,31 @@
+{
+  "name": "cat-bowl-monitor",
+  "build": { "dockerfile": "../Dockerfile", "context": ".." },
+  "remoteUser": "dev",
+  "runArgs": [
+    "--env-file", "${localWorkspaceFolder}/.env",
+    "--shm-size=2g"
+    // Uncomment if you have an NVIDIA GPU with WSL drivers installed:
+    // , "--gpus", "all"
+  ],
+  // Lets GUI windows (the labeler) appear on Windows through WSLg.
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+    "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+  ],
+  "containerEnv": {
+    "DISPLAY": ":0",
+    "WAYLAND_DISPLAY": "wayland-0",
+    "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}
