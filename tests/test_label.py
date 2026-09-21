@@ -215,12 +215,6 @@ def test_a_capture_row_whose_file_is_missing_fails_loudly(
     assert not Path(config["paths"]["labels_file"]).exists()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="core/cv_tools/labeler.py builds the status line with a string that "
-    "is missing its f prefix, so the screen says '[{QUIT_KEY}] quit'. Remove "
-    "this marker once that is fixed.",
-)
 def test_status_line_shows_the_real_back_and_quit_keys(
     config: dict[str, Any],
     images: list[str],

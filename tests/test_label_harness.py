@@ -31,24 +31,13 @@ from tests.label_harness import (
     UNASSIGNED_KEY,
     VISUAL_QUESTIONS,
     Check,
+    black_pixel_mask,
     build_sandbox,
     draw_scene,
+    orange_pixel_mask,
     print_report,
     run_harness,
 )
-
-
-def is_orange(image: np.ndarray) -> np.ndarray:
-    """Pixels close to the orange patch color (BGR 0, 140, 255)."""
-    return (
-        (image[..., 0] < 40) & (image[..., 1] > 110) & (image[..., 1] < 170)
-        & (image[..., 2] > 220)
-    )  # fmt: skip
-
-
-def is_black(image: np.ndarray) -> np.ndarray:
-    return (image < 45).all(axis=2)
-
 
 # --- The sandbox -------------------------------------------------------------
 
@@ -101,8 +90,8 @@ def test_pictures_show_the_patch_colors_their_label_promises(
     label_name: str, expects_orange: bool, expects_black: bool
 ) -> None:
     image = draw_scene(label_name, seed=3)
-    assert (is_orange(image).sum() > 300) == expects_orange
-    assert (is_black(image).sum() > 300) == expects_black
+    assert (orange_pixel_mask(image).sum() > 300) == expects_orange
+    assert (black_pixel_mask(image).sum() > 300) == expects_black
 
 
 def test_config_without_a_crop_gets_a_fallback_so_the_outline_can_be_checked(
