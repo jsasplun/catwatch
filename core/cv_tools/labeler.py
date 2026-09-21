@@ -107,7 +107,7 @@ class KeyboardLabeler:
         shown = cv2.resize(shown, None, fx=scale, fy=scale)
         legend = "  ".join(f"[{k}] {v}" for k, v in self._key_to_label.items())
         status = f"{position + 1}/{total}   [{BACK_KEY}] back " \
-            + "  [{QUIT_KEY}] quit"
+            + f"  [{QUIT_KEY}] quit"
         _put_outlined_text(shown, status, 30)
         _put_outlined_text(shown, legend, 60)
         return shown
