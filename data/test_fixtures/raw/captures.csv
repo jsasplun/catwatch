@@ -1,0 +1,15 @@
+image_path,captured_at,reason
+stills/train_empty.jpg,2026-08-01T00:00:00+00:00,fixture
+stills/train_black_patch_cat.jpg,2026-08-01T00:01:00+00:00,fixture
+stills/train_orange_patch_cat.jpg,2026-08-01T00:02:00+00:00,fixture
+stills/train_both_cats.jpg,2026-08-01T00:03:00+00:00,fixture
+stills/val_empty.jpg,2026-08-01T02:00:00+00:00,fixture
+stills/val_black_patch_cat.jpg,2026-08-01T02:01:00+00:00,fixture
+stills/val_orange_patch_cat.jpg,2026-08-01T02:02:00+00:00,fixture
+stills/val_both_cats.jpg,2026-08-01T02:03:00+00:00,fixture
+stills/test_empty.jpg,2026-08-01T03:00:00+00:00,fixture
+stills/test_black_patch_cat.jpg,2026-08-01T03:01:00+00:00,fixture
+stills/test_orange_patch_cat.jpg,2026-08-01T03:02:00+00:00,fixture
+stills/test_both_cats.jpg,2026-08-01T03:03:00+00:00,fixture
+stills/unusable_1.jpg,2026-08-01T00:31:00+00:00,fixture
+stills/unusable_2.jpg,2026-08-01T00:32:00+00:00,fixture

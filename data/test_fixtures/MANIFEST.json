@@ -1,0 +1,20 @@
+{
+  "bowl_visits.avi": "2bfccaacb080617b28022ca9af8ce61135f4287629cc7023227984230ad3a04f",
+  "bowl_visits.json": "53afc64279b8a6a3e3d64c0da22d1ca001085aeb10607335e433d39e53c2fa66",
+  "labels.csv": "6045eacb189498841d5585bfe7237a6dc31e54d187bdea93e9f2e7aca76c8943",
+  "raw/captures.csv": "21d0b0e7b09b82ca6d091bdb0dc128e4f9cace47aae854f09cfed002f4c39805",
+  "raw/stills/test_black_patch_cat.jpg": "bae399005dfa30ced77804e67019c06b6e19612cc48964dc468815975fe08e17",
+  "raw/stills/test_both_cats.jpg": "89f375e75ae409d2fc806cef10f8e59e7670e9735a3c5dd157e6633d8b93f73c",
+  "raw/stills/test_empty.jpg": "4f553ed96661401de362bbfcd49967ee0401ac4818ff44759d24fd07ee87fe45",
+  "raw/stills/test_orange_patch_cat.jpg": "73a3c89c27fa853f4ffbeac402712a46485bd7afbb16587b5dea02b118d4f5a4",
+  "raw/stills/train_black_patch_cat.jpg": "5a022831bf613de9075beaecc3d7f8cc2fb2c107c7fcacd449285a53de66576a",
+  "raw/stills/train_both_cats.jpg": "53fde1d9b1e41c333a9a678651e74106997b1c946148ad6778f0388e97c0d757",
+  "raw/stills/train_empty.jpg": "b0f770f4d07a474bff94662dcf106d6e8d4494d656fc4449a4c158355bf8dda8",
+  "raw/stills/train_orange_patch_cat.jpg": "f62541d03f71f847830fe798d22229f8797b49a1f032f0d41ace9eaa4ec5d8e9",
+  "raw/stills/unusable_1.jpg": "484398938c8a78eec20b8ed9c76505302c41dd00689b1fc64ec32b079aadcc0d",
+  "raw/stills/unusable_2.jpg": "96dacb0c01d890bba917d360c8b1685db90b764a89af99b6ca0e0a6285823c74",
+  "raw/stills/val_black_patch_cat.jpg": "943986e46c87650225fd593f8c23a183a373d9078e76013974047bf622cff4b5",
+  "raw/stills/val_both_cats.jpg": "bf4eef1c6d7fd5625a0f4c2e3c99a24a79cf6d9156aa3694c96a8b3aa9666ae2",
+  "raw/stills/val_empty.jpg": "6e7089057d5778d4129a40f82a604af88bc0e63a54eac42486769c86bf73d6a9",
+  "raw/stills/val_orange_patch_cat.jpg": "9292f28c5cad81aa8ffc3a0d7bcb5ed1aa5fd9471089044fe5dc606507722b15"
+}

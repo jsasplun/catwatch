@@ -1,0 +1,15 @@
+image_path,label,labeled_by,labeled_at
+stills/train_empty.jpg,empty,fixture-generator,2026-08-01T00:00:00+00:00
+stills/train_black_patch_cat.jpg,black_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/train_orange_patch_cat.jpg,orange_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/train_both_cats.jpg,both_cats,fixture-generator,2026-08-01T00:00:00+00:00
+stills/val_empty.jpg,empty,fixture-generator,2026-08-01T00:00:00+00:00
+stills/val_black_patch_cat.jpg,black_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/val_orange_patch_cat.jpg,orange_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/val_both_cats.jpg,both_cats,fixture-generator,2026-08-01T00:00:00+00:00
+stills/test_empty.jpg,empty,fixture-generator,2026-08-01T00:00:00+00:00
+stills/test_black_patch_cat.jpg,black_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/test_orange_patch_cat.jpg,orange_patch_cat,fixture-generator,2026-08-01T00:00:00+00:00
+stills/test_both_cats.jpg,both_cats,fixture-generator,2026-08-01T00:00:00+00:00
+stills/unusable_1.jpg,unusable,fixture-generator,2026-08-01T00:00:00+00:00
+stills/unusable_2.jpg,unusable,fixture-generator,2026-08-01T00:00:00+00:00
