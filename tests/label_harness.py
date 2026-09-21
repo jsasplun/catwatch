@@ -150,6 +150,17 @@ def draw_scene(correct_label: str, seed: int) -> np.ndarray:
     return np.clip(image.astype(int) + brightness + noise, 0, 255).astype(np.uint8)
 
 
+def orange_pixel_mask(image: np.ndarray) -> np.ndarray:
+    """True where a BGR pixel is close to the orange patch color."""
+    blue, green, red = image[..., 0], image[..., 1], image[..., 2]
+    return (blue < 60) & (green > 100) & (green < 180) & (red > 200)
+
+
+def black_pixel_mask(image: np.ndarray) -> np.ndarray:
+    """True where a BGR pixel is close to the black patch color."""
+    return (image < 50).all(axis=2)
+
+
 def load_real_config_without_secrets() -> dict[str, Any]:
     """Reads config.yaml directly. catwatch.settings.load_config() would also
     load .env, which holds secrets this harness has no need for."""
