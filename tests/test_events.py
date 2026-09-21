@@ -3,8 +3,12 @@
 # AI tool: Claude Opus 5
 
 from datetime import datetime, timedelta
+import sys
+from pathlib import Path
+# Adds the parent directory of this file to the python search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from core.events import EventTracker
+from core.cv_tools.events import EventTracker
 
 START = datetime(2026, 9, 19, 12, 0, 0)
 

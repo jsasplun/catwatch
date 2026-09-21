@@ -3,8 +3,12 @@
 # AI tool: Claude Opus 5
 
 from collections import Counter
+import sys
+from pathlib import Path
+# Adds the parent directory of this file to the python search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from core.splits import assign_split
+from core.cv_tools.splits import assign_split
 
 FRACTIONS = {"train": 0.7, "val": 0.15, "test": 0.15}
 
