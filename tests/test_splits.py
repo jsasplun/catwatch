@@ -2,9 +2,10 @@
 # Date Created: 9/20/26
 # AI tool: Claude Opus 5
 
-from collections import Counter
 import sys
+from collections import Counter
 from pathlib import Path
+
 # Adds the parent directory of this file to the python search path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
