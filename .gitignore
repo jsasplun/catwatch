@@ -10,3 +10,4 @@ delete_me/
 data/events.csv
 data/crop_check_*.jpg
 .conda/
+.vscode/settings.json
