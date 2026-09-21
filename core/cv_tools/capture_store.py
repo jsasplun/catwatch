@@ -23,7 +23,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from core.csv_log import append_csv_row, read_csv_rows
+from core.cv_tools.csv_log import append_csv_row, read_csv_rows
 
 CAPTURE_LOG_NAME = "captures.csv"
 CAPTURE_FIELDS = ("image_path", "captured_at", "reason")

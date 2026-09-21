@@ -27,12 +27,12 @@ import numpy as np
 
 from catwatch.hardware import open_camera
 from catwatch.settings import bowl_crop_box, load_config, project_path
-from core.capture_store import CaptureWriter
-from core.csv_log import append_csv_row
-from core.events import Event, EventTracker
-from core.onnx_classifier import OnnxImageClassifier, Prediction
-from core.preprocessing import Box, crop_to_box
-from core.run_records import read_json
+from core.cv_tools.capture_store import CaptureWriter
+from core.cv_tools.csv_log import append_csv_row
+from core.cv_tools.events import Event, EventTracker
+from core.cv_tools.onnx_classifier import OnnxImageClassifier, Prediction
+from core.cv_tools.preprocessing import Box, crop_to_box
+from core.cv_tools.run_records import read_json
 
 EVENT_FIELDS = (
     "cat",

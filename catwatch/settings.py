@@ -18,7 +18,7 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
-from core.preprocessing import Box
+from core.cv_tools.preprocessing import Box
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"

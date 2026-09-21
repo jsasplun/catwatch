@@ -22,9 +22,9 @@ from torch.utils.data import DataLoader
 
 from catwatch.data import items_for_split, load_labeled_images
 from catwatch.settings import bowl_crop_box, project_path
-from core.evaluation import classification_summary, predict_classes
-from core.run_records import file_sha256, read_json, write_json
-from core.training import ImageClassificationDataset, build_mobilenet_v3_small
+from core.cv_tools.evaluation import classification_summary, predict_classes
+from core.cv_tools.run_records import file_sha256, read_json, write_json
+from core.cv_tools.training import ImageClassificationDataset, build_mobilenet_v3_small
 
 
 def main() -> None:

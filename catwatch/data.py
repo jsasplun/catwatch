@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Any
 
 from catwatch.settings import project_path
-from core.capture_store import read_capture_log
-from core.labels import latest_labels
-from core.splits import assign_split
+from core.cv_tools.capture_store import read_capture_log
+from core.cv_tools.labels import latest_labels
+from core.cv_tools.splits import assign_split
 
 
 @dataclass(frozen=True)

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from core.camera import FrameSource, OpenCVSource, Picamera2Source
+from core.cv_tools.camera import FrameSource, OpenCVSource, Picamera2Source
 
 
 def open_camera(config: dict[str, Any]) -> FrameSource:

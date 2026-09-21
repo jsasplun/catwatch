@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from core.csv_log import append_csv_row, read_csv_rows
+from core.cv_tools.csv_log import append_csv_row, read_csv_rows
 
 LABEL_FIELDS = ("image_path", "label", "labeled_by", "labeled_at")
 

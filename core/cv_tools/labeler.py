@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from core.labels import append_label, latest_labels
+from core.cv_tools.labels import append_label, latest_labels
 
 WINDOW_NAME: str = "labeler"
 BACK_KEY: str = "z"

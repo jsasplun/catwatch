@@ -14,8 +14,8 @@ import argparse
 import getpass
 
 from catwatch.settings import bowl_crop_box, load_config, project_path
-from core.capture_store import read_capture_log
-from core.labeler import KeyboardLabeler
+from core.cv_tools.capture_store import read_capture_log
+from core.cv_tools.labeler import KeyboardLabeler
 
 
 def main() -> None:

@@ -18,14 +18,14 @@ from torch.utils.data import DataLoader
 
 from catwatch.data import items_for_split, load_labeled_images, report_split_counts
 from catwatch.settings import bowl_crop_box, load_config, project_path
-from core.capture_store import CAPTURE_LOG_NAME
-from core.run_records import (
+from core.cv_tools.capture_store import CAPTURE_LOG_NAME
+from core.cv_tools.run_records import (
     current_git_commit,
     file_sha256,
     new_run_directory,
     write_json,
 )
-from core.training import (
+from core.cv_tools.training import (
     ImageClassificationDataset,
     build_mobilenet_v3_small,
     build_training_augmentation,

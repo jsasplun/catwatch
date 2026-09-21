@@ -21,8 +21,8 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import models
 from torchvision.transforms import v2
 
-from core.evaluation import predict_classes
-from core.preprocessing import (
+from core.cv_tools.evaluation import predict_classes
+from core.cv_tools.preprocessing import (
     IMAGENET_MEAN,
     IMAGENET_STD,
     Box,

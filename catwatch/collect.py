@@ -19,8 +19,8 @@ from contextlib import closing
 
 from catwatch.hardware import open_camera
 from catwatch.settings import load_config, project_path
-from core.capture_store import CaptureWriter
-from core.motion import MotionDetector
+from core.cv_tools.capture_store import CaptureWriter
+from core.cv_tools.motion import MotionDetector
 
 
 def main() -> None:

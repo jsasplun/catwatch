@@ -21,7 +21,7 @@ import cv2
 
 from catwatch.hardware import open_camera
 from catwatch.settings import bowl_crop_box, load_config, project_path
-from core.preprocessing import crop_to_box
+from core.cv_tools.preprocessing import crop_to_box
 
 WARMUP_FRAMES = 30  # let auto-exposure and white balance settle first
 

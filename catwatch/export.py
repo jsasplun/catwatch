@@ -21,10 +21,10 @@ import torch
 
 from catwatch.data import items_for_split, load_labeled_images
 from catwatch.settings import bowl_crop_box, project_path
-from core.onnx_export import compare_to_onnx, export_to_onnx
-from core.preprocessing import load_image, to_model_input
-from core.run_records import read_json, write_json
-from core.training import build_mobilenet_v3_small
+from core.cv_tools.onnx_export import compare_to_onnx, export_to_onnx
+from core.cv_tools.preprocessing import load_image, to_model_input
+from core.cv_tools.run_records import read_json, write_json
+from core.cv_tools.training import build_mobilenet_v3_small
 
 PARITY_SAMPLE_SIZE = 32
 MAX_ALLOWED_LOGIT_DIFFERENCE = 1e-3

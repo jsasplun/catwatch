@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 
-from core.preprocessing import to_model_input
+from core.cv_tools.preprocessing import to_model_input
 
 
 @dataclass(frozen=True)
@@ -45,7 +45,10 @@ class OnnxImageClassifier:
 
     def predict(self, bgr_image: np.ndarray) -> Prediction:
         batch = to_model_input(bgr_image, self._image_size)[np.newaxis]
-        logits = self._session.run(None, {self._input_name: batch})[0][0]
+        logits = self._session.run(
+            None, 
+            {self._input_name: batch}
+        )[0][0]
         # Softmax converts raw scores into probabilities that sum to 1. It's
         # written out here because the usual library for it (SciPy) is a large
         # install on the Pi for a two-line formula. Subtracting the max first
