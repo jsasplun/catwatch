@@ -11,10 +11,13 @@ smoothing, the CSV log, the saved snapshots, the model card) is the real code.
 """
 
 from __future__ import annotations
+import sys
+from pathlib import Path
+# Adds the parent directory of this file to the python search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import csv
 import signal
-import sys
 import time
 from collections.abc import Callable, Iterator
 from datetime import datetime, timedelta

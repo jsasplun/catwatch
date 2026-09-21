@@ -5,6 +5,10 @@
 """Tests for catwatch.settings, plus sanity checks on the real config.yaml."""
 
 from __future__ import annotations
+import sys
+from pathlib import Path
+# Adds the parent directory of this file to the python search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pathlib import Path
 from typing import Any

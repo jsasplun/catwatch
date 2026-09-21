@@ -9,6 +9,10 @@ motion "happens" and how many seconds pass between frames.
 """
 
 from __future__ import annotations
+import sys
+from pathlib import Path
+# Adds the parent directory of this file to the python search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from collections.abc import Iterator
 from pathlib import Path
