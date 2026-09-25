@@ -33,12 +33,12 @@ This guide assumes no prior experience with Linux, Docker, or machine learning. 
 
 There are two machines:
 
-- **Your Windows computer** is where you label photos, train the model, and
+- **Your desktop computer** is where you label photos, train the model, and
   edit settings. All of that happens inside a "container": a sealed,
   pre-configured Linux environment that Docker runs, so every tool is the
   exact right version.
-- **The Raspberry Pi** is the small computer in the Pelican case. It takes
-  photos and, once trained, runs the model to watch the bowl.
+- **The Raspberry Pi** lives in the Pelican case, takes
+  photos, and, once trained, runs the model to watch the bowl.
 
 The workflow, in order:
 
