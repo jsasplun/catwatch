@@ -8,15 +8,24 @@ from __future__ import annotations
 
 from typing import Any
 
-from core.cv_tools.camera import FrameSource, OpenCVSource, Picamera2Source
+from core.cv_tools.camera import (
+    FrameSource,
+    OpenCVSource,
+    Picamera2Source,
+    RotatedSource,
+)
 
 
 def open_camera(config: dict[str, Any]) -> FrameSource:
     camera = config["camera"]
     if camera["source"] == "picamera2":
-        return Picamera2Source(
-            camera["width"],
-            camera["height"],
-            camera["lens_position"]
+        source: FrameSource = Picamera2Source(
+            camera["width"], camera["height"], camera["lens_position"]
         )
-    return OpenCVSource(camera["source"])  # webcam index or video file path
+    else:
+        source = OpenCVSource(camera["source"])  # webcam index or video file path
+
+    # Older config.yaml files (and tests) may not have this key at all, which
+    # means "mounted right side up": no rotation.
+    degrees = camera.get("rotate_degrees", 0)
+    return source if degrees == 0 else RotatedSource(source, degrees)

@@ -11,6 +11,9 @@ on a Raspberry Pi camera, a USB webcam, or a recorded video file on a laptop.
 Every frame is a NumPy array shaped (height, width, 3) with color channels in
 BGR order (blue, green, red), which is the order OpenCV expects.
 
+Wrap any source in RotatedSource to correct for how the camera is physically
+mounted (e.g. upside down).
+
 Use sources with contextlib.closing so the camera is released even on errors:
 
     with closing(OpenCVSource(0)) as camera:
@@ -45,12 +48,59 @@ class OpenCVSource:
     def read(self) -> np.ndarray:
         ok, frame = self._capture.read()
         if not ok:
-            raise RuntimeError("No frame returned: end of video or camera" +
-                               "unplugged")
+            raise RuntimeError(
+                "No frame returned: end of video or camera" + "unplugged"
+            )
         return frame
 
     def close(self) -> None:
         self._capture.release()
+
+
+# Maps a clockwise rotation in degrees to the OpenCV constant that performs
+# it. 0 is included so callers can treat "no rotation" the same as any other
+# choice instead of special-casing it.
+_ROTATIONS = {
+    0: None,
+    90: cv2.ROTATE_90_CLOCKWISE,
+    180: cv2.ROTATE_180,
+    270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+}
+
+
+def rotate_frame(frame: np.ndarray, degrees: int) -> np.ndarray:
+    """Rotate a frame clockwise by 0, 90, 180, or 270 degrees.
+
+    A camera is not always mounted "right side up". One bolted to a ceiling
+    and looking straight down, for example, often ends up producing images
+    that are upside down (180 degrees) relative to how a person standing in
+    the room would see the scene. Correcting that here, once, means every
+    later step (motion detection, cropping, the model) can assume the frame
+    already looks the way a person expects.
+    """
+    if degrees not in _ROTATIONS:
+        raise ValueError(f"Rotation must be 0, 90, 180, or 270 degrees, got {degrees}")
+    turn = _ROTATIONS[degrees]
+    return frame if turn is None else cv2.rotate(frame, turn)
+
+
+class RotatedSource:
+    """Wraps any FrameSource and rotates every frame it hands back.
+
+    This lets a camera's physical mounting angle be corrected in one place,
+    so scripts that read frames never need to know or care how the camera is
+    mounted.
+    """
+
+    def __init__(self, source: FrameSource, degrees: int) -> None:
+        self._source = source
+        self._degrees = degrees
+
+    def read(self) -> np.ndarray:
+        return rotate_frame(self._source.read(), self._degrees)
+
+    def close(self) -> None:
+        self._source.close()
 
 
 class Picamera2Source:
@@ -87,10 +137,7 @@ class Picamera2Source:
         self._camera.start()
         if lens_position is not None:
             self._camera.set_controls(
-                {
-                    "AfMode": controls.AfModeEnum.Manual,
-                    "LensPosition": lens_position
-                }
+                {"AfMode": controls.AfModeEnum.Manual, "LensPosition": lens_position}
             )
 
     def read(self) -> np.ndarray:

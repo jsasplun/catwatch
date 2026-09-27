@@ -5,8 +5,10 @@
 """Tests for catwatch.hardware: choosing which camera config.yaml asks for."""
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
+
 # Adds the parent directory of this file to the python search path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -18,7 +20,8 @@ import numpy as np
 import pytest
 
 from catwatch import hardware
-from core.cv_tools.camera import OpenCVSource
+from core.cv_tools.camera import OpenCVSource, RotatedSource
+from tests.fakes import FakeCamera, make_frame
 
 
 class RecordingSource:
@@ -89,3 +92,31 @@ def test_video_file_source_yields_bgr_frames(tmp_path: Path) -> None:
 def test_missing_video_file_raises_a_clear_error(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="Could not open video source"):
         hardware.open_camera({"camera": {"source": str(tmp_path / "nope.mp4")}})
+
+
+def test_no_rotate_degrees_key_means_no_rotation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Config files written before rotation existed must keep working."""
+    monkeypatch.setattr(hardware, "OpenCVSource", RecordingSource)
+    camera = hardware.open_camera({"camera": {"source": 0}})
+    assert isinstance(camera, RecordingSource)
+
+
+def test_rotate_degrees_zero_is_not_wrapped(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(hardware, "OpenCVSource", RecordingSource)
+    camera = hardware.open_camera({"camera": {"source": 0, "rotate_degrees": 0}})
+    assert isinstance(camera, RecordingSource)
+
+
+def test_nonzero_rotate_degrees_wraps_the_source_and_rotates_its_frames(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    frame = make_frame(4, 4, (0, 0, 0))
+    frame[0, 0] = (255, 255, 255)
+    monkeypatch.setattr(hardware, "OpenCVSource", lambda _source: FakeCamera([frame]))
+
+    camera = hardware.open_camera({"camera": {"source": 0, "rotate_degrees": 180}})
+    assert isinstance(camera, RotatedSource)
+    rotated = camera.read()
+    assert tuple(rotated[3, 3]) == (255, 255, 255)  # top-left moved to bottom-right
