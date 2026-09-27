@@ -134,7 +134,7 @@ You should see "Hello from Docker!".
 
 ### 3.3 Install VS Code and its extensions
 
-1. Install VS Code from <https://code.visualstudio.com/>.
+1. Install VS Code from <https://git.visualstudio.com/>.
 2. Open it and click the Extensions icon (four squares) on the left.
 3. Search for and install **WSL** (by Microsoft) and **Dev Containers** (by Microsoft).
 
@@ -152,8 +152,8 @@ Keep the project **inside Linux**, in your Linux home folder, not on `C:`.
 
 ```bash
 # Where: WSL
-mkdir -p ~/code
-cd ~/code
+mkdir -p ~/git
+cd ~/git
 git clone REPOSITORY_URL cat-bowl-monitor
 cd cat-bowl-monitor
 ```
@@ -163,7 +163,7 @@ Replace `REPOSITORY_URL` with the address of wherever this repo is hosted. If Gi
 ### 3.6 Create the secrets file and the data-storage folder
 
 ```bash
-# Where: WSL (inside ~/code/cat-bowl-monitor)
+# Where: WSL (inside ~/git/cat-bowl-monitor)
 cp .env.example .env
 mkdir -p ~/dvc-storage
 ```
@@ -350,6 +350,12 @@ The Pi gets the correct time from the internet, so keep it on Wi-Fi. A Pi 4 has 
 
 ### 6.2 Test the camera
 
+Make sure you are connected to the PI via
+
+```bash
+ssh -X $PI
+```
+
 ```bash
 # Where: Pi
 rpicam-hello --list-cameras
@@ -369,8 +375,8 @@ Copy it to your computer and look at it:
 
 ```bash
 # Where: WSL
-scp $PI:~/test.jpg ~/code/cat-bowl-monitor/
-cd ~/code/cat-bowl-monitor
+scp $PI:~/test.jpg ~/git/cat-bowl-monitor/
+cd ~/git/cat-bowl-monitor
 explorer.exe .
 ```
 
@@ -391,7 +397,7 @@ Run this from your computer whenever you've changed code or `config.yaml`. It co
 
 ```bash
 # Where: WSL
-cd ~/code/cat-bowl-monitor
+cd ~/git/cat-bowl-monitor
 rsync -av \
   --exclude '.git' --exclude '.dvc' --exclude '.venv*' --exclude '__pycache__' \
   --exclude 'data/' --exclude 'runs/' --exclude 'models/' \
@@ -455,14 +461,16 @@ It prints the frame size, e.g. `1280 x 960 pixels`, and saves a picture. Copy it
 
 ```bash
 # Where: WSL
-mkdir -p ~/code/cat-bowl-monitor/data
-scp "$PI:~/cat-bowl-monitor/data/crop_check_*.jpg" ~/code/cat-bowl-monitor/data/
-explorer.exe ~/code/cat-bowl-monitor/data
+mkdir -p ~/git/cat-bowl-monitor/data
+scp "$PI:~/cat-bowl-monitor/data/crop_check_*.jpg" ~/git/cat-bowl-monitor/data/
+explorer.exe ~/git/cat-bowl-monitor/data
 ```
 
 Pixel positions count from the top-left corner: `x` goes right, `y` goes down.
 
 ### 7.3 Set the crop and focus
+
+If the camera is mounted so the picture comes out upside down (or sideways), fix that first: in `config.yaml`, set `camera.rotate_degrees` to `180` (upside down) or `90`/`270` (sideways). It must be one of those four numbers. Re-run `check_crop` and confirm the saved picture now looks right side up — the crop coordinates below are measured on that corrected picture, so getting the rotation right first saves you from re-measuring the crop later.
 
 In VS Code, open `config.yaml` and edit the `bowl_crop` line. For example:
 
@@ -554,8 +562,8 @@ The Pi can only run **one** camera program at a time: collect, check_crop, or mo
 
 ```bash
 # Where: WSL
-mkdir -p ~/code/cat-bowl-monitor/data
-rsync -av $PI:~/cat-bowl-monitor/data/raw/ ~/code/cat-bowl-monitor/data/raw/
+mkdir -p ~/git/cat-bowl-monitor/data
+rsync -av $PI:~/cat-bowl-monitor/data/raw/ ~/git/cat-bowl-monitor/data/raw/
 ```
 
 This guide calls it **"pull photos from the Pi."** It's safe to run repeatedly; it only copies new files.
@@ -564,7 +572,7 @@ Open a few photos before labeling to make sure they're sharp and framed correctl
 
 ```bash
 # Where: WSL
-explorer.exe ~/code/cat-bowl-monitor/data/raw
+explorer.exe ~/git/cat-bowl-monitor/data/raw
 ```
 
 ---
@@ -725,7 +733,7 @@ First sync code to the Pi (the command in 6.4). Then copy the models:
 
 ```bash
 # Where: WSL
-rsync -av ~/code/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/
+rsync -av ~/git/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/
 ```
 
 ### 11.4 Test run on the Pi
@@ -840,7 +848,7 @@ Press Ctrl+C to stop watching. The monitor keeps running.
 
 ```bash
 # Where: WSL
-rsync -av $PI:~/cat-bowl-monitor/data/events.csv ~/code/cat-bowl-monitor/data/
+rsync -av $PI:~/cat-bowl-monitor/data/events.csv ~/git/cat-bowl-monitor/data/
 ```
 
 `events.csv` opens in Excel. Each row is one visit: which cat, start time, end time, and duration in seconds.
@@ -997,7 +1005,7 @@ Run the labeler from WSL instead of the container. It only needs a few small pac
 
 ```bash
 # Where: WSL
-cd ~/code/cat-bowl-monitor
+cd ~/git/cat-bowl-monitor
 python3 -m venv .venv-label
 .venv-label/bin/pip install opencv-python PyYAML python-dotenv
 .venv-label/bin/python -m catwatch.label --labeled-by YOURNAME
@@ -1026,7 +1034,7 @@ Be suspicious. Check the table printed at the start of training. With only a few
 
 **Everything in the container is very slow**
 
-The project is probably under `/mnt/c/...`. Move it to `~/code` inside WSL
+The project is probably under `/mnt/c/...`. Move it to `~/git` inside WSL
 (section 3.5).
 
 **Git says "dubious ownership"**
@@ -1063,15 +1071,15 @@ Copy the **entire** error message, from the first line of the traceback to the l
 | Sync code to the Pi | WSL | see section 6.4 |
 | Check the crop | Pi | `python -m catwatch.check_crop` |
 | Collect photos | Pi | `tmux new -s collect`, then `python -m catwatch.collect`, then Ctrl+B, D |
-| Pull photos from the Pi | WSL | `rsync -av $PI:~/cat-bowl-monitor/data/raw/ ~/code/cat-bowl-monitor/data/raw/` |
+| Pull photos from the Pi | WSL | `rsync -av $PI:~/cat-bowl-monitor/data/raw/ ~/git/cat-bowl-monitor/data/raw/` |
 | Label | Container | `python -m catwatch.label --labeled-by YOURNAME` |
 | Save a data version | Container | `dvc add data/raw && git add data/raw.dvc data/.gitignore data/labels.csv && git commit -m "Labels: ..." && dvc push` |
 | Train | Container | `python -m catwatch.train` |
 | Evaluate | Container | `python -m catwatch.evaluate --run runs/RUN_FOLDER` |
 | Export | Container | `python -m catwatch.export --run runs/RUN_FOLDER` |
-| Copy models to the Pi | WSL | `rsync -av ~/code/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/` |
+| Copy models to the Pi | WSL | `rsync -av ~/git/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/` |
 | Restart the monitor | Pi | `sudo systemctl restart catwatch` |
 | Watch visits live | Pi | `journalctl -u catwatch -f` |
-| Get the visit log | WSL | `rsync -av $PI:~/cat-bowl-monitor/data/events.csv ~/code/cat-bowl-monitor/data/` |
+| Get the visit log | WSL | `rsync -av $PI:~/cat-bowl-monitor/data/events.csv ~/git/cat-bowl-monitor/data/` |
 | Check code quality | Container | `make verify` |
 | Shut down the Pi | Pi | `sudo shutdown -h now` |
