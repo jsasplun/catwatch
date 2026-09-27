@@ -26,10 +26,9 @@ Box = tuple[int, int, int, int]  # (x, y, width, height) in pixels
 
 def crop_to_box(image: np.ndarray, box: Box) -> np.ndarray:
     x, y, width, height = box
-    cropped = image[y: y + height, x: x + width]
+    cropped = image[y : y + height, x : x + width]
     if cropped.size == 0:
-        raise ValueError(f"Crop box {box} is outside image of shape " +
-                         "{image.shape}")
+        raise ValueError(f"Crop box {box} is outside image of shape " + "{image.shape}")
     return cropped
 
 
@@ -50,5 +49,4 @@ def to_model_input(bgr_image: np.ndarray, size: int) -> np.ndarray:
     resized = cv2.resize(bgr_image, (size, size), interpolation=cv2.INTER_AREA)
     rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
     normalized = (rgb - IMAGENET_MEAN) / IMAGENET_STD
-    return np.ascontiguousarray(normalized.transpose(2, 0, 1),
-                                dtype=np.float32)
+    return np.ascontiguousarray(normalized.transpose(2, 0, 1), dtype=np.float32)

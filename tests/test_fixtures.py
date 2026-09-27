@@ -16,8 +16,10 @@ test_fixture_files_match_their_manifest fails if a fixture is ever changed.
 """
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
+
 # Adds the parent directory of this file to the python search path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -52,6 +54,10 @@ VIDEO = FIXTURES / make_fixtures.VIDEO_NAME
 VIDEO_INFO = read_json(FIXTURES / make_fixtures.VIDEO_INFO_NAME)
 MIN_PATCH_PIXELS = 300  # patch pixels expected in a still that shows that patch
 MIN_VIDEO_PATCH_PIXELS = 100  # the video is half the size, so a quarter the area
+# How far a regenerated fixture JPEG may drift from the committed one (0-255
+# scale); see test_generator_reproduces_the_committed_fixtures.
+MAX_MEAN_PIXEL_DIFFERENCE = 1.0
+MAX_PIXEL_DIFFERENCE = 30
 
 
 @pytest.fixture(autouse=True)
@@ -152,12 +158,21 @@ def test_generator_reproduces_the_committed_fixtures(tmp_path: Path) -> None:
     make_fixtures.generate(again)
     for name in ("labels.csv", "raw/captures.csv", make_fixtures.VIDEO_INFO_NAME):
         assert (again / name).read_bytes() == (FIXTURES / name).read_bytes(), name
-    # Pictures are compared after decoding, since JPEG bytes can differ
-    # slightly between library versions.
+    # Pictures are compared after decoding, and loosely, because JPEG output
+    # is not identical across builds of the JPEG library: the same drawing
+    # saved on two machines decodes to pixels that differ a little everywhere
+    # and by up to about 20 right at sharp color edges. Two limits keep the
+    # test meaningful anyway. The average difference stays well under 1 for
+    # the same drawing, and no single pixel may be off by more than
+    # MAX_PIXEL_DIFFERENCE. A real change to the drawing code, such as a
+    # moved or recolored patch, changes many pixels by 100 or more and fails
+    # both.
     for still in sorted((FIXTURES / "raw" / "stills").glob("*.jpg")):
         new = cv2.imread(str(again / "raw" / "stills" / still.name)).astype(int)
         old = cv2.imread(str(still)).astype(int)
-        assert np.abs(new - old).max() <= 3, still.name
+        difference = np.abs(new - old)
+        assert difference.mean() < MAX_MEAN_PIXEL_DIFFERENCE, still.name
+        assert difference.max() <= MAX_PIXEL_DIFFERENCE, still.name
     assert len(read_video_frames(again / make_fixtures.VIDEO_NAME)) == len(
         read_video_frames(VIDEO)
     )

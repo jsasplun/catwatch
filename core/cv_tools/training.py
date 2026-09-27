@@ -73,7 +73,7 @@ class ImageClassificationDataset(Dataset[tuple[torch.Tensor, int]]):
         if self._augment is None:
             return (
                 torch.from_numpy(to_model_input(image, self._image_size)),
-                class_index
+                class_index,
             )
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # (3, H, W) uint8
@@ -100,18 +100,12 @@ def build_training_augmentation(image_size: int) -> v2.Compose:
             v2.RandomVerticalFlip(),
             v2.ColorJitter(brightness=0.3, contrast=0.3),
             v2.ToDtype(torch.float32, scale=True),
-            v2.Normalize(
-                mean=IMAGENET_MEAN.tolist(),
-                std=IMAGENET_STD.tolist()
-            ),
+            v2.Normalize(mean=IMAGENET_MEAN.tolist(), std=IMAGENET_STD.tolist()),
         ]
     )
 
 
-def build_mobilenet_v3_small(
-        num_classes: int,
-        pretrained: bool = True
-) -> nn.Module:
+def build_mobilenet_v3_small(num_classes: int, pretrained: bool = True) -> nn.Module:
     """MobileNetV3-Small with its last layer replaced for our classes.
 
     "Pretrained" means it already learned general visual features from about
@@ -189,18 +183,9 @@ def train_classifier(
             loss_sum += loss.item() * len(targets)
             image_count += len(targets)
 
-        true_classes, predicted_classes = predict_classes(
-            model,
-            val_loader,
-            device
-        )
+        true_classes, predicted_classes = predict_classes(model, val_loader, device)
         score = float(
-            f1_score(
-                true_classes,
-                predicted_classes,
-                average="macro",
-                zero_division=0
-            )
+            f1_score(true_classes, predicted_classes, average="macro", zero_division=0)
         )
         summary = EpochSummary(epoch, loss_sum / image_count, score)
         history.append(summary)

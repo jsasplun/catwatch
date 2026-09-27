@@ -49,11 +49,7 @@ def load_labeled_images(config: dict[str, Any]) -> list[LabeledImage]:
         if label is None or label not in class_names:
             continue  # not labeled yet, or labeled "unusable"
         split = assign_split(group_for(capture["captured_at"]), fractions)
-        images.append(LabeledImage(
-            raw_dir / capture["image_path"],
-            label,
-            split
-        ))
+        images.append(LabeledImage(raw_dir / capture["image_path"], label, split))
     return images
 
 
@@ -64,9 +60,7 @@ def items_for_split(
     expects."""
     index_of = {name: index for index, name in enumerate(class_names)}
     return [
-        (image.path, index_of[image.label])
-        for image in images
-        if image.split == split
+        (image.path, index_of[image.label]) for image in images if image.split == split
     ]
 
 
@@ -80,7 +74,5 @@ def report_split_counts(
     counts = Counter((image.split, image.label) for image in images)
     print(f"{'class':<20}" + "".join(f"{name:>8}" for name in split_names))
     for class_name in class_names:
-        row = "".join(
-            f"{counts[(split, class_name)]:>8}" for split in split_names
-        )
+        row = "".join(f"{counts[(split, class_name)]:>8}" for split in split_names)
         print(f"{class_name:<20}{row}")

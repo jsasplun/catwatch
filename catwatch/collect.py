@@ -27,9 +27,9 @@ def main() -> None:
     config = load_config()
     capture = config["capture"]
     writer = CaptureWriter(project_path(config["paths"]["raw_dir"]))
-    detector = MotionDetector(min_changed_fraction=capture[
-        "motion_min_changed_fraction"
-    ])
+    detector = MotionDetector(
+        min_changed_fraction=capture["motion_min_changed_fraction"]
+    )
     # time.monotonic() measures elapsed time and never jumps backwards, unlike
     # the wall clock, which can jump when the Pi syncs its time over the
     # network.
@@ -44,15 +44,14 @@ def main() -> None:
                 now = time.monotonic()
                 moved = detector.update(frame)
                 since_motion_save = now - last_motion_save
-                if moved and since_motion_save >= capture[
-                    "min_seconds_between_motion_saves"
-                ]:
+                if (
+                    moved
+                    and since_motion_save >= capture["min_seconds_between_motion_saves"]
+                ):
                     writer.save(frame, "motion")
                     last_motion_save = now
                     saved_count += 1
-                elif now - last_periodic_save >= capture[
-                    "periodic_save_every_seconds"
-                ]:
+                elif now - last_periodic_save >= capture["periodic_save_every_seconds"]:
                     writer.save(frame, "periodic")
                     last_periodic_save = now
                     saved_count += 1

@@ -41,6 +41,5 @@ class MotionDetector:
         work_height = round(height * self._work_width / width)
         small = cv2.resize(frame, (self._work_width, work_height))
         foreground_mask = self._subtractor.apply(small)
-        changed_fraction = np.count_nonzero(foreground_mask) \
-            / foreground_mask.size
+        changed_fraction = np.count_nonzero(foreground_mask) / foreground_mask.size
         return changed_fraction >= self._min_changed_fraction

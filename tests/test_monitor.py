@@ -11,8 +11,10 @@ smoothing, the CSV log, the saved snapshots, the model card) is the real code.
 """
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
+
 # Adds the parent directory of this file to the python search path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -392,7 +394,7 @@ def test_headless_mode_never_draws(
     monitor.main()
 
 
-def test_a_missing_model_card_fails_before_the_camera_is_opened(
+def test_missing_model_card_fails_before_camera_is_opened(
     deployment: SimpleNamespace, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     (deployment.model_dir / "model_card.json").unlink()
@@ -401,3 +403,10 @@ def test_a_missing_model_card_fails_before_the_camera_is_opened(
     with pytest.raises(FileNotFoundError):
         monitor.main()
     assert opened == []
+
+
+if __name__ == "__main__":
+    # Lets this file run directly (e.g. VS Code's "Run Python File"), instead
+    # of only through `pytest` on the command line. __file__ tells pytest to
+    # collect just the tests in this one file.
+    sys.exit(pytest.main([__file__]))

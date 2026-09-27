@@ -23,8 +23,7 @@ def main() -> None:
     parser.add_argument(
         "--labeled-by",
         default=getpass.getuser(),
-        help="Name stored with each label,"
-        + " useful if more than one person labels.",
+        help="Name stored with each label," + " useful if more than one person labels.",
     )
     args = parser.parse_args()
 

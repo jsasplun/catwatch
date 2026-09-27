@@ -43,11 +43,7 @@ def main() -> None:
 
     model = build_mobilenet_v3_small(len(class_names), pretrained=False)
     model.load_state_dict(
-        torch.load(
-            args.run / "model.pt",
-            map_location="cpu",
-            weights_only=True
-        )
+        torch.load(args.run / "model.pt", map_location="cpu", weights_only=True)
     )
     output_dir = project_path(config["paths"]["models_dir"]) / args.run.name
     output_dir.mkdir(parents=True, exist_ok=False)
@@ -58,12 +54,10 @@ def main() -> None:
     sample = items_for_split(load_labeled_images(config), "val", class_names)
     sample = sample[:PARITY_SAMPLE_SIZE]
     if not sample:
-        raise SystemExit("No validation images available" +
-                         "for the parity check.")
-    batch = np.stack([
-        to_model_input(load_image(path, crop), image_size)
-        for path, _ in sample
-    ])
+        raise SystemExit("No validation images available" + "for the parity check.")
+    batch = np.stack(
+        [to_model_input(load_image(path, crop), image_size) for path, _ in sample]
+    )
     parity = compare_to_onnx(model, onnx_path, batch)
     print(f"ONNX parity check: {parity}")
     if (
@@ -83,9 +77,9 @@ def main() -> None:
             "git_commit": run_info["git_commit"],
             "labels_sha256": run_info["labels_sha256"],
             "onnx_parity_check": parity,
-            "val_metrics": read_json(val_metrics_path)
-            if val_metrics_path.exists()
-            else None,
+            "val_metrics": (
+                read_json(val_metrics_path) if val_metrics_path.exists() else None
+            ),
         },
     )
     print(f"Exported to {output_dir}")

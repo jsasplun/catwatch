@@ -23,6 +23,6 @@ def test_core_never_imports_project_code() -> None:
                 continue
             for module in imported:
                 top_level = module.split(".")[0]
-                assert top_level not in FORBIDDEN_PACKAGES, (
-                    f"{source_file.name} imports {module}"
-                )
+                assert (
+                    top_level not in FORBIDDEN_PACKAGES
+                ), f"{source_file.name} imports {module}"

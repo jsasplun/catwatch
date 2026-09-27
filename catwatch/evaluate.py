@@ -44,11 +44,7 @@ def main() -> None:
             "may not be comparable with earlier evaluations of this run."
         )
 
-    items = items_for_split(
-        load_labeled_images(config),
-        args.split,
-        class_names
-    )
+    items = items_for_split(load_labeled_images(config), args.split, class_names)
     loader = DataLoader(
         ImageClassificationDataset(
             items, config["training"]["image_size"], bowl_crop_box(config)
@@ -57,19 +53,11 @@ def main() -> None:
     )
     model = build_mobilenet_v3_small(len(class_names), pretrained=False)
     model.load_state_dict(
-        torch.load(
-            args.run / "model.pt",
-            map_location="cpu",
-            weights_only=True
-        )
+        torch.load(args.run / "model.pt", map_location="cpu", weights_only=True)
     )
     true_classes, predicted_classes = predict_classes(model, loader, "cpu")
 
-    summary = classification_summary(
-        true_classes,
-        predicted_classes,
-        class_names
-    )
+    summary = classification_summary(true_classes, predicted_classes, class_names)
     write_json(args.run / f"metrics_{args.split}.json", summary)
     with (args.run / f"errors_{args.split}.csv").open("w", newline="") as file:
         writer = csv.writer(file)
@@ -78,10 +66,9 @@ def main() -> None:
             items, true_classes, predicted_classes
         ):
             if true_index != predicted_index:
-                writer.writerow([
-                    path, class_names[true_index],
-                    class_names[predicted_index]
-                ])
+                writer.writerow(
+                    [path, class_names[true_index], class_names[predicted_index]]
+                )
 
     report = summary["report"]
     print(f"{'class':<20}{'precision':>10}{'recall':>8}{'f1':>8}{'count':>8}")

@@ -18,11 +18,7 @@ INPUT_NAME = "image"
 OUTPUT_NAME = "logits"
 
 
-def export_to_onnx(
-        model: nn.Module,
-        output_path: Path,
-        image_size: int
-) -> None:
+def export_to_onnx(model: nn.Module, output_path: Path, image_size: int) -> None:
     """Save the model as ONNX and check that the file is well-formed.
 
     Input "image": (batch, 3, image_size, image_size). Output "logits":
@@ -55,19 +51,11 @@ def compare_to_onnx(
     """
     with torch.no_grad():
         torch_logits = model.cpu().eval()(torch.from_numpy(inputs)).numpy()
-    session = ort.InferenceSession(
-        str(onnx_path),
-        providers=["CPUExecutionProvider"]
-    )
+    session = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
     onnx_logits = session.run(None, {INPUT_NAME: inputs})[0]
     return {
-        "max_abs_logit_difference": float(
-            np.abs(torch_logits - onnx_logits).max()
-        ),
+        "max_abs_logit_difference": float(np.abs(torch_logits - onnx_logits).max()),
         "same_predictions": bool(
-            np.array_equal(
-                torch_logits.argmax(axis=1),
-                onnx_logits.argmax(axis=1)
-            )
+            np.array_equal(torch_logits.argmax(axis=1), onnx_logits.argmax(axis=1))
         ),
     }

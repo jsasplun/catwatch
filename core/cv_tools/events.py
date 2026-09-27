@@ -40,10 +40,7 @@ class EventTracker:
     """
 
     def __init__(
-        self,
-        background_label: str,
-        window_size: int,
-        min_duration_seconds: float
+        self, background_label: str, window_size: int, min_duration_seconds: float
     ) -> None:
         self._background_label = background_label
         self._min_duration_seconds = min_duration_seconds
@@ -62,9 +59,9 @@ class EventTracker:
         None."""
         self._recent_labels.append(label)
         majority_label = Counter(self._recent_labels).most_common(1)[0][0]
-        new_active: Counter | None = None \
-            if majority_label == self._background_label \
-            else majority_label
+        new_active: Counter | None = (
+            None if majority_label == self._background_label else majority_label
+        )
         if new_active == self._active_label:
             return None
         finished: Event | None = self.finish(timestamp)

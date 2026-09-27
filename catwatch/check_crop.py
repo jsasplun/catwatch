@@ -34,9 +34,7 @@ def main() -> None:
             frame = camera.read()
 
     height, width = frame.shape[:2]
-    print(
-        f"Frame size: {width} x {height} pixels (x grows right, y grows down)"
-    )
+    print(f"Frame size: {width} x {height} pixels (x grows right, y grows down)")
     output_dir = project_path("data")
     output_dir.mkdir(exist_ok=True)
     box = bowl_crop_box(config)
@@ -44,16 +42,9 @@ def main() -> None:
     if box is not None:
         x, y, box_width, box_height = box
         cv2.rectangle(
-            annotated,
-            (x, y),
-            (x + box_width, y + box_height),
-            (0, 255, 255),
-            3
+            annotated, (x, y), (x + box_width, y + box_height), (0, 255, 255), 3
         )
-        cv2.imwrite(
-            str(output_dir / "crop_check_crop.jpg"),
-            crop_to_box(frame, box)
-        )
+        cv2.imwrite(str(output_dir / "crop_check_crop.jpg"), crop_to_box(frame, box))
     cv2.imwrite(str(output_dir / "crop_check_full.jpg"), annotated)
     print(f"Saved check images to {output_dir}")
 

@@ -45,10 +45,7 @@ class OnnxImageClassifier:
 
     def predict(self, bgr_image: np.ndarray) -> Prediction:
         batch = to_model_input(bgr_image, self._image_size)[np.newaxis]
-        logits = self._session.run(
-            None, 
-            {self._input_name: batch}
-        )[0][0]
+        logits = self._session.run(None, {self._input_name: batch})[0][0]
         # Softmax converts raw scores into probabilities that sum to 1. It's
         # written out here because the usual library for it (SciPy) is a large
         # install on the Pi for a two-line formula. Subtracting the max first
@@ -57,6 +54,5 @@ class OnnxImageClassifier:
         probabilities = exponentials / exponentials.sum()
         best_index = int(np.argmax(probabilities))
         return Prediction(
-            self._class_names[best_index],
-            float(probabilities[best_index])
+            self._class_names[best_index], float(probabilities[best_index])
         )

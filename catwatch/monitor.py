@@ -34,20 +34,10 @@ from core.cv_tools.onnx_classifier import OnnxImageClassifier, Prediction
 from core.cv_tools.preprocessing import Box, crop_to_box
 from core.cv_tools.run_records import read_json
 
-EVENT_FIELDS = (
-    "cat",
-    "display_name",
-    "started_at",
-    "ended_at",
-    "duration_seconds"
-)
+EVENT_FIELDS = ("cat", "display_name", "started_at", "ended_at", "duration_seconds")
 
 
-def log_event(
-        events_file: Path,
-        event: Event,
-        display_names: dict[str, str]
-) -> None:
+def log_event(events_file: Path, event: Event, display_names: dict[str, str]) -> None:
     name = display_names.get(event.label, event.label)
     append_csv_row(
         events_file,
@@ -60,52 +50,33 @@ def log_event(
             "duration_seconds": round(event.duration_seconds, 1),
         },
     )
-    print(f"{event.started_at:%H:%M:%S}  {name} at bowl for" +
-          f" {event.duration_seconds:.0f}s")
+    print(
+        f"{event.started_at:%H:%M:%S}  {name} at bowl for"
+        + f" {event.duration_seconds:.0f}s"
+    )
 
 
 def show_prediction(
-        frame: np.ndarray,
-        prediction: Prediction,
-        crop: Box | None
+    frame: np.ndarray, prediction: Prediction, crop: Box | None
 ) -> None:
     shown = frame.copy()
     if crop is not None:
         x, y, width, height = crop
         cv2.rectangle(shown, (x, y), (x + width, y + height), (0, 255, 255), 3)
     text = f"{prediction.label} {prediction.confidence:.2f}"
+    cv2.putText(shown, text, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 6)
     cv2.putText(
-        shown,
-        text,
-        (10, 40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
-        (0, 0, 0),
-        6
-    )
-    cv2.putText(
-        shown,
-        text,
-        (10, 40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
-        (255, 255, 255),
-        2
+        shown, text, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2
     )
     cv2.imshow(
-        "catwatch",
-        cv2.resize(shown, (800, 800 * frame.shape[0] // frame.shape[1]))
+        "catwatch", cv2.resize(shown, (800, 800 * frame.shape[0] // frame.shape[1]))
     )
     cv2.waitKey(1)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--show",
-        action="store_true",
-        help="Display live predictions."
-    )
+    parser.add_argument("--show", action="store_true", help="Display live predictions.")
     args = parser.parse_args()
 
     config = load_config()
@@ -113,9 +84,7 @@ def main() -> None:
     model_dir = project_path(settings["model_dir"])
     model_card = read_json(model_dir / "model_card.json")
     classifier = OnnxImageClassifier(
-        model_dir / "model.onnx",
-        model_card["class_names"],
-        model_card["image_size"]
+        model_dir / "model.onnx", model_card["class_names"], model_card["image_size"]
     )
     crop = bowl_crop_box(model_card)  # the crop this model was trained with
     tracker = EventTracker(
@@ -143,16 +112,12 @@ def main() -> None:
                 if prediction.confidence >= settings["min_confidence"]:
                     previously_active = tracker.active_label
                     finished = tracker.update(
-                        prediction.label,
-                        datetime.now().astimezone()
+                        prediction.label, datetime.now().astimezone()
                     )
                     if finished is not None:
                         log_event(events_file, finished, display_names)
                     if tracker.active_label not in (None, previously_active):
-                        snapshot_writer.save(
-                            frame,
-                            f"event-{tracker.active_label}"
-                        )
+                        snapshot_writer.save(frame, f"event-{tracker.active_label}")
                 if args.show:
                     show_prediction(frame, prediction, crop)
                 elapsed = time.monotonic() - loop_started
