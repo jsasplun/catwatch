@@ -29,11 +29,21 @@ camera:
   source: picamera2        # or 0 for a USB webcam, or a path to a video file
   width: 1280
   height: 960
-  lens_position: null      # e.g. 2.0 for a bowl 0.5 m away (autofocus cameras)
+  # Fixes the focus so it doesn't hunt (autofocus "searching," which blurs
+  # frames) when a cat walks in. Camera Module 3 has autofocus, so this
+  # matters here. Value is 1 ÷ distance in metres from lens to bowl:
+  # 56 in = 1.4224 m → 1 ÷ 1.4224 = 0.703.
+  lens_position: 0.703
+  # Clockwise rotation to undo how the camera is physically mounted. Ours is
+  # bolted to the top of the case looking straight down, which turns the
+  # image upside down, so 180. Must be 0, 90, 180, or 270. Set this BEFORE
+  # tuning bowl_crop below: check_crop's saved pictures already show the
+  # rotated frame, and the crop's x/y coordinates are measured on it.
+  rotate_degrees: 180
 
 # Region the model looks at, in pixels of the full frame. null = whole frame.
 # Set it with `python -m catwatch.check_crop` BEFORE you start labeling.
-bowl_crop: null
+bowl_crop: {x: 240, y: 80, width: 800, height: 800}
 # bowl_crop: {x: 240, y: 80, width: 800, height: 800}
 
 capture:
