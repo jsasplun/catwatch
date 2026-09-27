@@ -11,7 +11,7 @@ Two environments, with different constraints:
 | Where | Runs | Has PyTorch? | How it's set up |
 |---|---|---|---|
 | Desktop (Windows + WSL + Docker dev container) | labeling, training, evaluation, export, tests | Yes | `Dockerfile`, `.devcontainer/`, `requirements.txt` |
-| Raspberry Pi (Raspberry Pi OS Bookworm, native venv, no Docker) | `catwatch.collect`, `catwatch.check_crop`, `catwatch.monitor` | **No** | apt packages + `requirements-pi.txt` |
+| Raspberry Pi 5 (Raspberry Pi OS Trixie, Python 3.13, native venv, no Docker) | `catwatch.collect`, `catwatch.check_crop`, `catwatch.monitor` | **No** | apt packages + `requirements-pi.txt` |
 
 The pipeline:
 
@@ -26,7 +26,7 @@ The pipeline:
 
 ## Repository layout and the core rule
 
-- `core/`: Reusable, domain-agnostic building blocks (camera, motion, capture storage, labels, labeler, splits, preprocessing, training, evaluation, ONNX export/inference, event smoothing, run records).
+- `core/`: Reusable, domain-agnostic building blocks, as modules in `core/cv_tools/` (camera, motion, capture storage, labels, labeler, splits, preprocessing, training, evaluation, ONNX export/inference, event smoothing, run records).
 - `catwatch/`: This project's scripts and glue (settings, data joining, entry points run with `python -m catwatch.<name>`).
 - `tests/`: Pytest tests.
 - `config.yaml`: Every project-specific name and number.
@@ -50,21 +50,21 @@ Project-specific values go in `config.yaml`, never hard-coded.
 - picamera2 (from apt)
 - onnxruntime, PyYAML, python-dotenv
 
-Currently Pi-safe modules: `core.camera`, `core.motion`, `core.csv_log`, `core.capture_store`, `core.labels`, `core.splits`, `core.preprocessing`, `core.onnx_classifier`, `core.events`, `core.run_records`, `catwatch.settings`, `catwatch.hardware`, `catwatch.data`.
+Currently Pi-safe modules: `core.cv_tools.camera`, `core.cv_tools.motion`, `core.cv_tools.csv_log`, `core.cv_tools.capture_store`, `core.cv_tools.labels`, `core.cv_tools.splits`, `core.cv_tools.preprocessing`, `core.cv_tools.onnx_classifier`, `core.cv_tools.events`, `core.cv_tools.run_records`, `catwatch.settings`, `catwatch.hardware`, `catwatch.data`.
 
 Do not add torch or sklearn imports to any of them. If a Pi-side script needs new functionality, put it in a module that stays Pi-safe.
 
-`picamera2` and `libcamera` are imported lazily inside `Picamera2Source`, so `core/camera.py` still loads on the desktop. Keep it that way.
+`picamera2` and `libcamera` are imported lazily inside `Picamera2Source`, so `core/cv_tools/camera.py` still loads on the desktop. Keep it that way.
 
 ## Invariants that protect the data and the metrics
 
 Breaking any of these silently corrupts results. Don't change them without the user's explicit OK, and explain the consequence when you ask.
 
 1. **Raw data is immutable.** Never modify, rename, move, or delete anything under `data/raw/`, including `captures.csv`. Images are referenced by their path relative to `data/raw/`.
-2. **`data/labels.csv` is append-only.** The newest row for an image wins. Never rewrite, sort, deduplicate, or hand-edit it. Corrections are new rows (written through `core.labels.append_label`).
+2. **`data/labels.csv` is append-only.** The newest row for an image wins. Never rewrite, sort, deduplicate, or hand-edit it. Corrections are new rows (written through `core.cv_tools.labels.append_label`).
 3. **Class order in `config.yaml` → `classes` defines model output indices.** Never reorder or rename existing classes. New classes go at the end and require retraining.
-4. **Split assignment is deterministic.** `core.splits.assign_split` (SHA-256 of the group id) and `catwatch.data.group_for` (one group per clock hour) decide which images are train/val/test. Changing either one moves images between splits. That invalidates every earlier comparison and can leak test images into training.
-5. **Preprocessing parity.** Evaluation and deployed inference both go through `core.preprocessing.to_model_input`. Changing it requires retraining, re-export, and re-running the export parity check. Training augmentation must never shift hue: the two classes differ only by patch color.
+4. **Split assignment is deterministic.** `core.cv_tools.splits.assign_split` (SHA-256 of the group id) and `catwatch.data.group_for` (one group per clock hour) decide which images are train/val/test. Changing either one moves images between splits. That invalidates every earlier comparison and can leak test images into training.
+5. **Preprocessing parity.** Evaluation and deployed inference both go through `core.cv_tools.preprocessing.to_model_input`. Changing it requires retraining, re-export, and re-running the export parity check. Training augmentation must never shift hue: the two classes differ only by patch color.
 6. **The model and its crop travel together.** `catwatch.monitor` reads the crop and class names from `models/<run>/model_card.json`, not from today's `config.yaml`. Keep it that way.
 7. **The test split is used once**, for the final chosen model. Tune and compare on `val`. Never add code that selects models or hyperparameters using `test`.
 8. **Never use model predictions as labels.** Event snapshots saved by the monitor must be labeled fresh by a human.
