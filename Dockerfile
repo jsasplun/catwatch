@@ -5,8 +5,12 @@ FROM python:3.11-slim-bookworm
 #                                            and to open windows
 #   git, make                                - version control and the Makefile
 #   rsync, openssh-client                    - copying files to/from the Pi
+#   libatomic1                               - needed by the Node.js runtime
+#                                            that the pyright type checker
+#                                            downloads and runs
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libgl1 libglib2.0-0 libsm6 libxext6 git make rsync openssh-client \
+        libatomic1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/requirements.txt
