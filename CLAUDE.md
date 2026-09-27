@@ -8,7 +8,7 @@ All project rules live in AGENTS.md. It is the single source of truth. Edit rule
 
 - For any change touching more than one file, or anything in `core/`, present a short plan first: which files, where each piece lives and why (core vs catwatch), and how you'll verify it. Then implement.
 - Before editing `core/`, re-check the Pi-side import constraint and the invariants list in AGENTS.md.
-- End every coding task by running `make format`, `make verify`, and make typecheck`. Report the actual results, including failures. Don't summarize a run you didn't do.
+- End every coding task by running `make format`, `make verify`, and `make typecheck`. Report the actual results, including failures. Don't summarize a run you didn't do.
 - When reporting results, separate what you verified (commands run, files inspected) from what you're inferring. Say "I haven't verified X" plainly.
 - Correct your own earlier mistakes as soon as you notice them. Name the error and the fix.
 
