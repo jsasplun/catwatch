@@ -11,6 +11,9 @@ scikit-learn==1.5.2
 PyYAML==6.0.2
 python-dotenv==1.0.1
 dvc==3.56.0
+# dvc 3.56 imports a private name that pathspec removed in 1.0, and dvc
+# itself doesn't cap the version, so pin pathspec below 1.0 here.
+pathspec==0.12.1
 
 black==24.10.0
 ruff==0.7.4
