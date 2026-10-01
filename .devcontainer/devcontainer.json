@@ -11,7 +11,8 @@
   // Lets GUI windows (the labeler) appear on Windows through WSLg.
   "mounts": [
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+    "source=/mnt/wslg,target=/mnt/wslg,type=bind",
+    "source=${localEnv:HOME}/dvc-storage,target=/dvc-storage,type=bind"
   ],
   "containerEnv": {
     "DISPLAY": ":0",
