@@ -56,10 +56,7 @@ def main() -> None:
 
     train_loader = DataLoader(
         ImageClassificationDataset(
-            train_items,
-            image_size,
-            crop,
-            build_training_augmentation(image_size)
+            train_items, image_size, crop, build_training_augmentation(image_size)
         ),
         batch_size=settings["batch_size"],
         shuffle=True,
@@ -87,8 +84,7 @@ def main() -> None:
     )
 
     run_dir = new_run_directory(
-        project_path(config["paths"]["runs_dir"]),
-        f"seed{seed}"
+        project_path(config["paths"]["runs_dir"]), f"seed{seed}"
     )
     torch.save(model.state_dict(), run_dir / "model.pt")
     raw_dir = project_path(config["paths"]["raw_dir"])
@@ -98,9 +94,7 @@ def main() -> None:
             "seed": seed,
             "class_names": class_names,
             "git_commit": current_git_commit(),
-            "labels_sha256": file_sha256(
-                project_path(config["paths"]["labels_file"])
-            ),
+            "labels_sha256": file_sha256(project_path(config["paths"]["labels_file"])),
             "captures_sha256": file_sha256(raw_dir / CAPTURE_LOG_NAME),
             "image_counts": {
                 split: len(items_for_split(images, split, class_names))
