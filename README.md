@@ -736,27 +736,58 @@ First sync code to the Pi (the command in 6.4). Then copy the models:
 rsync -av ~/git/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/
 ```
 
-### 11.4 Test run on the Pi
+### 11.4 Run the monitor in tmux
 
-Make sure the collector isn't running (section 8.4), then:
+Make sure the collector isn't running (section 8.4) and the startup service isn't either (`sudo systemctl stop catwatch`, if you've set up section 12). Then start the monitor inside `tmux`, the same way as the collector, so it keeps running after you disconnect:
 
 ```bash
 # Where: Pi
+tmux new -s monitor
 cd ~/cat-bowl-monitor
 source .venv/bin/activate
 python -m catwatch.monitor
 ```
 
-It prints `Monitoring with model ...`. When a cat drinks for a few seconds and walks away, a line appears, e.g.:
+It prints `Monitoring with model ...`. Then it prints one line when a cat arrives and another when it leaves:
 
 ```
-14:32:05  Cat with orange patches at bowl for 12s
+14:32:05  Cat with orange patches arrived (photo: 143205_118204_event-orange_patch_cat.jpg)
+14:32:17  Cat with orange patches left after 12s (saved to events.csv)
 ```
 
-Press **Ctrl+C** to stop.
+The "arrived" line shows up about 1.5 seconds after the cat does: the monitor waits until most of the last 5 predictions agree, so one odd frame can't fake a visit. Visits shorter than 3 seconds are thrown away as walk-bys. Both numbers are in `config.yaml` under `monitor:` (`smoothing_window`, `min_event_seconds`).
 
-**Check it against reality.** Watch a real visit and confirm the printed line names the right cat. The photo taken at the start of each visit is also saved, in `data/raw/<date>/..._event-<cat>.jpg`, so you can check visits you
-didn't see.
+Now **detach**: press **Ctrl+B**, let go, then press **D**. The monitor keeps running. To check on it later:
+
+```bash
+# Where: Pi
+tmux attach -t monitor
+```
+
+Detach again with Ctrl+B, then D. To stop it, attach, press **Ctrl+C**, then type `exit`.
+
+**Where visits are saved** (all on the Pi, under `~/cat-bowl-monitor/`):
+
+| File | What's in it | When it's written |
+|---|---|---|
+| `data/events.csv` | One row per visit: cat, display name, start time, end time, seconds | When the cat **leaves** |
+| `data/raw/<date>/..._event-<cat>.jpg` | A photo of the frame where the visit started | When the cat **arrives** |
+| `data/raw/captures.csv` | One row per saved photo, including those visit photos | When the cat **arrives** |
+
+`events.csv` doesn't exist until the first visit ends. A visit still in progress when you press Ctrl+C is saved on the way out, but one in progress when the power is pulled is lost. To copy the log to your computer, see section 13.
+
+**If nothing is printed while a cat is at the bowl,** stop the monitor and run it with `--verbose`. That prints every prediction (2 per second) with its confidence, e.g. `14:32:04  orange_patch_cat 0.97`:
+
+```bash
+# Where: Pi
+python -m catwatch.monitor --verbose
+```
+
+- Predictions say `empty` while the cat is there: the model is missing it. Check that the cat is inside the crop box, and label more photos like this one (section 14).
+- Predictions name the cat but the confidence is below `0.6` (`min_confidence` in `config.yaml`): those frames are ignored. More labeled photos is the fix, not a lower threshold.
+- No lines at all: the monitor isn't running, or another program has the camera.
+
+**Check it against reality.** Watch a real visit and confirm the printed lines name the right cat. The visit photos let you check visits you didn't see.
 
 **To see live predictions on the Pi's own screen:** sit at the Pi with the screen and keyboard, open a terminal on its desktop, and run the same commands with `--show` at the end:
 
@@ -1078,6 +1109,7 @@ Copy the **entire** error message, from the first line of the traceback to the l
 | Evaluate | Container | `python -m catwatch.evaluate --run runs/RUN_FOLDER` |
 | Export | Container | `python -m catwatch.export --run runs/RUN_FOLDER` |
 | Copy models to the Pi | WSL | `rsync -av ~/git/cat-bowl-monitor/models/ $PI:~/cat-bowl-monitor/models/` |
+| Run the monitor by hand | Pi | `tmux new -s monitor`, then `python -m catwatch.monitor`, then Ctrl+B, D |
 | Restart the monitor | Pi | `sudo systemctl restart catwatch` |
 | Watch visits live | Pi | `journalctl -u catwatch -f` |
 | Get the visit log | WSL | `rsync -av $PI:~/cat-bowl-monitor/data/events.csv ~/git/cat-bowl-monitor/data/` |
