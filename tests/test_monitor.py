@@ -153,7 +153,7 @@ def test_log_event_writes_one_row_with_a_friendly_name(
         "ended_at": "2026-09-19T12:00:12.340000",
         "duration_seconds": "12.3",
     }
-    assert "Cat with black patches at bowl for 12s" in capsys.readouterr().out
+    assert "Cat with black patches left after 12s" in capsys.readouterr().out
 
 
 def test_log_event_falls_back_to_the_raw_label_without_a_display_name(
@@ -230,7 +230,12 @@ def test_a_sustained_visit_is_logged_once_and_snapshotted_once(
         Path(deployment.config["paths"]["raw_dir"]) / captures[0]["image_path"]
     ).is_file()
     assert camera.closed
-    assert "Stopping." in capsys.readouterr().out
+    # The arrival is announced right away, before the visit is over.
+    output = capsys.readouterr().out
+    arrived_at = output.index("Cat with black patches arrived")
+    assert captures[0]["image_path"].split("/")[-1] in output[arrived_at:]
+    assert arrived_at < output.index("Cat with black patches left after")
+    assert "Stopping." in output
 
 
 def test_the_model_is_built_from_the_model_card(
@@ -377,6 +382,22 @@ def test_show_flag_draws_every_frame(
     monkeypatch.setattr(sys, "argv", ["monitor", "--show"])
     monitor.main()
     assert shown == [EMPTY, BLACK]
+
+
+def test_verbose_flag_prints_every_prediction(
+    deployment: SimpleNamespace,
+    monkeypatch: pytest.MonkeyPatch,
+    sleeps: list[float],
+    restore_sigterm_handler: None,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    install_fakes(monkeypatch, [EMPTY, UNSURE_BOTH])
+    monkeypatch.setattr(sys, "argv", ["monitor", "--verbose"])
+    monitor.main()
+    output = capsys.readouterr().out
+    # Low-confidence predictions are printed too, even though they're ignored.
+    assert "empty 0.95" in output
+    assert "both_cats 0.30" in output
 
 
 def test_headless_mode_never_draws(

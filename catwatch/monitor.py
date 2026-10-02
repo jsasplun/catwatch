@@ -4,12 +4,18 @@
 
 """Runs on the Raspberry Pi: watches the bowl and logs which cat visits.
 
-    python -m catwatch.monitor           # headless (for the systemd service)
-    python -m catwatch.monitor --show    # also draw predictions on the screen
+    python -m catwatch.monitor             # headless (tmux or the systemd service)
+    python -m catwatch.monitor --verbose   # also print every single prediction
+    python -m catwatch.monitor --show      # also draw predictions on the screen
 
-Each visit is appended to data/events.csv. The frame at the start of each visit
-is saved into the raw data folder (reason "event-<label>"), so you can check
-the model's calls by eye and later label those frames as new training data.
+A line is printed when a cat arrives and another when it leaves. Each finished
+visit is appended to data/events.csv. The frame at the start of each visit is
+saved into the raw data folder (reason "event-<label>"), so you can check the
+model's calls by eye and later label those frames as new training data.
+
+Every print uses flush=True. Without it, Python holds output in a buffer when
+it isn't writing straight to a terminal (for example under systemd), so lines
+would show up in `journalctl` minutes late or only when the program exits.
 """
 
 from __future__ import annotations
@@ -51,8 +57,9 @@ def log_event(events_file: Path, event: Event, display_names: dict[str, str]) ->
         },
     )
     print(
-        f"{event.started_at:%H:%M:%S}  {name} at bowl for"
-        + f" {event.duration_seconds:.0f}s"
+        f"{event.ended_at:%H:%M:%S}  {name} left after"
+        f" {event.duration_seconds:.0f}s (saved to {events_file.name})",
+        flush=True,
     )
 
 
@@ -77,6 +84,9 @@ def show_prediction(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--show", action="store_true", help="Display live predictions.")
+    parser.add_argument(
+        "--verbose", action="store_true", help="Print every prediction (2 per second)."
+    )
     args = parser.parse_args()
 
     config = load_config()
@@ -101,7 +111,7 @@ def main() -> None:
     # the `finally` block record a visit that is still in progress.
     signal.signal(signal.SIGTERM, lambda _signum, _stack: sys.exit(0))
 
-    print(f"Monitoring with model {model_dir.name}. Ctrl+C to stop.")
+    print(f"Monitoring with model {model_dir.name}. Ctrl+C to stop.", flush=True)
     with closing(open_camera(config)) as camera:
         try:
             while True:
@@ -109,6 +119,12 @@ def main() -> None:
                 frame = camera.read()
                 region = frame if crop is None else crop_to_box(frame, crop)
                 prediction = classifier.predict(region)
+                if args.verbose:
+                    print(
+                        f"{datetime.now():%H:%M:%S}  {prediction.label}"
+                        f" {prediction.confidence:.2f}",
+                        flush=True,
+                    )
                 if prediction.confidence >= settings["min_confidence"]:
                     previously_active = tracker.active_label
                     finished = tracker.update(
@@ -116,14 +132,21 @@ def main() -> None:
                     )
                     if finished is not None:
                         log_event(events_file, finished, display_names)
-                    if tracker.active_label not in (None, previously_active):
-                        snapshot_writer.save(frame, f"event-{tracker.active_label}")
+                    arrived = tracker.active_label
+                    if arrived is not None and arrived != previously_active:
+                        snapshot = snapshot_writer.save(frame, f"event-{arrived}")
+                        print(
+                            f"{datetime.now():%H:%M:%S}"
+                            f"  {display_names.get(arrived, arrived)} arrived"
+                            f" (photo: {snapshot.name})",
+                            flush=True,
+                        )
                 if args.show:
                     show_prediction(frame, prediction, crop)
                 elapsed = time.monotonic() - loop_started
                 time.sleep(max(0.0, seconds_per_prediction - elapsed))
         except KeyboardInterrupt:
-            print("\nStopping.")
+            print("\nStopping.", flush=True)
         finally:
             final_event = tracker.finish(datetime.now().astimezone())
             if final_event is not None:
